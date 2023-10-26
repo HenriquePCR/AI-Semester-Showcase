@@ -1,6 +1,6 @@
 # Artificial Intelligence Lab 2023/2
 
-Algorithms made during the semester
+Algorithms developed during the semester
 
 ## Description
 
