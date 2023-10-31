@@ -1,3 +1,4 @@
+from math import trunc
 import numpy as np
 import random
 
@@ -55,38 +56,42 @@ mutation_rate = 0.1  # Taxa de mutação
 # Inicialização da população
 population = np.random.uniform(low=-10, high=10, size=(pop_size, num_genes))
 lineage = []
-for i, n in enumerate(population):    
+for i, n in enumerate(population):
     x = n[0]
     y = n[1]
     current_bird = bird_function(x,y)
     new_chromosome = chromosome(x,y, current_bird, None, None)
     lineage.append(new_chromosome)
-
 # 100 gerações
-for i in range(0,num_generations):
+for gen in range(0,num_generations):
     # Sort pela função objetiva
     sorted_lineage = sorted(lineage, key=lambda x: x.bird)
 
-    # Somas do ranks
+    # Rank linear e soma dos ranks
     pocket_total = 0
     for i, n in enumerate(sorted_lineage):
-        n.rank = linear_value(i)
+        n.rank = linear_value(i+1)
         pocket_total+= n.rank
-        n.pocket = pocket_total
+        n.pocket = pocket_total    
+
+    # Print dos cromossomos
+    if(gen == 1 or gen == 10 or gen == 99):
+        print("Geração: ", gen)
+        for n in lineage:
+            print(n.bird)
+        print()        
 
     # Selecionar 100 cromossomos através da roleta
-    parents = []
+    parents = []    
     for i in range(0,100):
-        r1 = random.randint(1,5101)
+        r1 = random.randint(int(sorted_lineage[0].pocket),int(sorted_lineage[-1].pocket))
         for n in sorted_lineage:
             if n.pocket >= r1:
                 parents.append(n)
 
-
-
     # Selecionar os 100 pais a partir dos 100 selecionados e realizar o crossover
     lineage.clear()
-    for i in range(0,100):
+    for i in range(0,50):
         r1 = random.randint(1,100)
         parent1 = parents[r1]
         r1 = random.randint(1,100)
@@ -95,3 +100,4 @@ for i in range(0,num_generations):
         lineage.append(childs[0])
         lineage.append(childs[1])
 
+ 
