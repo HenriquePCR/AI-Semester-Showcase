@@ -11,7 +11,7 @@ It contains topics such as A\* search, Neural Networks, Genetic Algorithm and mu
 
 ### Executing program
 
-- Use your terminal to get into the respective folder
+- Use your terminal to get into the respective folderds
 
 ```
 py fileName.py
