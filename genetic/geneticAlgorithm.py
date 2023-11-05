@@ -40,8 +40,8 @@ def crossover(chromossome1, chromossome2, crossover_tax):
 def mutate(chromossomeInput):
     x = chromossomeInput.x 
     y = chromossomeInput.y    
-    x += np.random.uniform(-20,20)
-    y += np.random.uniform(-20,20)
+    x += np.random.uniform(-5,5)
+    y += np.random.uniform(-5,5)
     bird = bird_function(x, y)
     new_chromosome = chromosome(x,y,bird,None,None)
     return new_chromosome
@@ -60,82 +60,80 @@ worst_values=[]
 
 # Inicialização da população
 population = np.random.uniform(low=-10, high=10, size=(pop_size, num_genes))
-lineage = []
+generation = []
 for i, n in enumerate(population):
     x = n[0]
     y = n[1]
     current_bird = bird_function(x,y)
     new_chromosome = chromosome(x,y, current_bird, None, None)
-    lineage.append(new_chromosome)
-sorted_lineage = sorted(lineage, key=lambda x: x.bird)
-best_chromosome = sorted_lineage[0]
+    generation.append(new_chromosome)
+sorted_generation = sorted(generation, key=lambda x: x.bird)
+best_chromosome = sorted_generation[0]
 print("melhor: ",best_chromosome.bird)
 
 
 # 100 gerações
 for gen in range(0,num_generations):
     # Sort pela função objetiva
-    sorted_lineage = sorted(lineage, key=lambda x: x.bird)
-    if best_chromosome.bird > sorted_lineage[0].bird:
-        sorted_lineage[0] = best_chromosome
+    sorted_generation = sorted(generation, key=lambda x: x.bird)
+    if best_chromosome.bird > sorted_generation[0].bird:
+        sorted_generation[0] = best_chromosome
 
 
     # Rank linear e soma dos ranks
     pocket_total = 0
-    for i, n in enumerate(sorted_lineage):
+    for i, n in enumerate(sorted_generation):
         n.rank = linear_value(i+1)
         pocket_total+= n.rank
         n.pocket = pocket_total  
     
-    #Print dos cromossomos
-    if(gen == 0 or gen == num_generations//4 or gen == num_generations//2 or gen == num_generations-1):
-        print("Geração: ", gen)
-        for n in sorted_lineage:
-            print(n.bird, n.pocket)
-        print(best_chromosome.bird)
-        print()        
+    # #Print dos cromossomos
+    # if(gen == 0 or gen == num_generations//4 or gen == num_generations//2 or gen == num_generations-1):
+    print("Geração: ", gen)
+    for n in sorted_generation:
+        print(n.bird, n.pocket)
+    print(best_chromosome.bird)
+    print()        
 
-    # Selecionar 100 cromossomos através da roleta
-    parents = []    
-    for i in range(0,100):
-        r1 = random.randint(0,int(sorted_lineage[-1].pocket))
-        for n in sorted_lineage:
-            if n.pocket >= r1:
-                parents.append(n)
-                break            
-    
-    # Calculate the average and worst values for the current generation
-    generation_birds = [n.bird for n in sorted_lineage]
+    # Calcula os valores médios e piores para a geração atual
+    generation_birds = [n.bird for n in sorted_generation]
     average_bird = sum(generation_birds) / len(generation_birds)
-    worst_bird = sorted_lineage[-1].bird
+    worst_bird = sorted_generation[-1].bird
 
-    # Update the best, average, and worst values lists
+    # Atualiza as listas de melhores, médios e piores valores
     best_values.append(best_chromosome.bird)
     average_values.append(average_bird)
     worst_values.append(worst_bird)
 
-    # Selecionar os 100 pais a partir dos 100 selecionados e realizar o crossover
-    lineage.clear()
+    # Seleciona 100 cromossomos através da roleta
+    generation = []    
     for i in range(0,50):
-        r1 = random.randint(0,99)
-        parent1 = parents[r1]
-        r1 = random.randint(0,99)
-        parent2 = parents[r1]
+        r1 = random.randint(0,int(sorted_generation[-1].pocket))
+        for n in sorted_generation:
+            if n.pocket >= r1:
+                parent1=n
+                break      
+        r2 = random.randint(0,int(sorted_generation[-1].pocket))
+        for n in sorted_generation:
+            if n.pocket >= r2:
+                parent2=n
+                break   
         childs = crossover(parent1, parent2, crossover_tax)
-        lineage.append(childs[0])
-        lineage.append(childs[1])
+        generation.append(childs[0])
+        generation.append(childs[1])          
 
+        
     # Mutação
-    for n in lineage:
-        rMutation = np.random.uniform(0,100)
+    for i, n in enumerate(generation):
+        rMutation = np.random.uniform(0, 100)
         if (rMutation <= mutation_rate):
             print("mutação ocorreu")
             mutatedChromosome = mutate(n)
-            n = mutatedChromosome
-        if(n.bird<best_chromosome.bird):         
-            best_chromosome=n
+            generation[i] = mutatedChromosome
+        if(n.bird < best_chromosome.bird):         
+            best_chromosome = n
 
-# Create a graphic showing the best, average, and worst values for each generation
+# Gera um gráfico mostrando os melhores, médios e piores valores para cada geração
 generations = list(range(num_generations))
 plt.plot(generations, best_values, label='Best Chromosome')
 plt.plot(generations, average_values, label='Average Chromosome')
