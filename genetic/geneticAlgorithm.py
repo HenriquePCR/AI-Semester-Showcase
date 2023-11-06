@@ -86,24 +86,26 @@ for gen in range(0,num_generations):
         n.rank = linear_value(i+1)
         pocket_total+= n.rank
         n.pocket = pocket_total  
-    
-    # #Print dos cromossomos
-    # if(gen == 0 or gen == num_generations//4 or gen == num_generations//2 or gen == num_generations-1):
-    print("Geração: ", gen)
-    for n in sorted_generation:
-        print(n.bird, n.pocket)
-    print(best_chromosome.bird)
-    print()        
+      
 
     # Calcula os valores médios e piores para a geração atual
     generation_birds = [n.bird for n in sorted_generation]
     average_bird = sum(generation_birds) / len(generation_birds)
     worst_bird = sorted_generation[-1].bird
 
+
     # Atualiza as listas de melhores, médios e piores valores
     best_values.append(best_chromosome.bird)
     average_values.append(average_bird)
     worst_values.append(worst_bird)
+
+    
+    #Print dos cromossomos
+    if(gen == 0 or gen == (num_generations//4)-1 or gen == (num_generations//2)-1 or gen == num_generations-1):
+        print("Geração:", gen+1)
+        print("Média dos cromossomos:", average_values[gen])
+        print("Melhor cromossomo:", "\nx:",best_chromosome.x, "y:",best_chromosome.y, "bird:",best_chromosome.bird)
+        print()      
 
     # Seleciona 100 cromossomos através da roleta
     generation = []    
@@ -121,13 +123,11 @@ for gen in range(0,num_generations):
         childs = crossover(parent1, parent2, crossover_tax)
         generation.append(childs[0])
         generation.append(childs[1])          
-
         
     # Mutação
     for i, n in enumerate(generation):
         rMutation = np.random.uniform(0, 100)
         if (rMutation <= mutation_rate):
-            print("mutação ocorreu")
             mutatedChromosome = mutate(n)
             generation[i] = mutatedChromosome
         if(n.bird < best_chromosome.bird):         
