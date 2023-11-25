@@ -1,6 +1,6 @@
 ### Integrantes:
 Henrique Pereira Cristófaro
-Vitor Theodoro Rocha Domingues
+<br>Vitor Theodoro Rocha Domingues
 
 # Enunciado
 
